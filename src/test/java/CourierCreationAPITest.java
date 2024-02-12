@@ -1,14 +1,18 @@
+import org.junit.Before;
 import org.junit.Test;
 import io.qameta.allure.junit4.DisplayName;
 import io.qameta.allure.Description;
-import io.qameta.allure.Step;
 
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.CoreMatchers.equalTo;
 
 
 public class CourierCreationAPITest extends BaseTest {
 
+    private CourierClient courierClient;
+
+    @Before
+    public void setup() {
+        courierClient = new CourierClient();
+    }
 
     @Test
     @DisplayName("Успешное создание курьера")
@@ -16,8 +20,9 @@ public class CourierCreationAPITest extends BaseTest {
     public void testCreateCourierSuccess() {
         String uniqueLogin = "testLogin" + System.currentTimeMillis();
         Courier courier = new Courier(uniqueLogin, "password123", "John");
-        createCourier(courier);
+        courierClient.createCourier(courier);
     }
+
 
     @Test
     @DisplayName("Невозможно создать дублирующую учетную запись курьера")
@@ -25,8 +30,8 @@ public class CourierCreationAPITest extends BaseTest {
     public void testCannotCreateDuplicateCouriers() {
         String uniqueLogin = "testLogin" + System.currentTimeMillis();
         Courier courier = new Courier(uniqueLogin, "password123", "John");
-        createCourier(courier);
-        attemptToCreateDuplicateCourier(courier);
+        courierClient.createCourier(courier);
+        CourierClient.attemptToCreateDuplicateCourier(courier);
     }
 
     @Test
@@ -34,7 +39,7 @@ public class CourierCreationAPITest extends BaseTest {
     @Description("Проверка, что необходимо указать логин для создания учетной записи курьера")
     public void testCannotCreateCourierWithoutLogin() {
         Courier courier = new Courier("", "12345", "John");
-        attemptToCreateCourierWithInvalidData(courier);
+        CourierClient.attemptToCreateCourierWithInvalidData(courier);
     }
 
     @Test
@@ -43,44 +48,14 @@ public class CourierCreationAPITest extends BaseTest {
     public void testCannotCreateCourierWithoutPassword() {
         String uniqueLogin = "testLogin" + System.currentTimeMillis();
         Courier courier = new Courier(uniqueLogin, "", "John");
-        attemptToCreateCourierWithInvalidData(courier);
+        CourierClient.attemptToCreateCourierWithInvalidData(courier);
     }
 
-    @Step("Создание курьера")
-    private void createCourier(Courier courier) {
-        given()
-                .header("Content-Type", "application/json")
-                .body(courier)
-                .when()
-                .post("/api/v1/courier")
-                .then()
-                .statusCode(201)
-                .body("ok", equalTo(true));
-    }
 
-    @Step("Попытка создать дубликат учетной записи курьера")
-    private void attemptToCreateDuplicateCourier(Courier courier) {
-        given()
-                .header("Content-Type", "application/json")
-                .body(courier)
-                .when()
-                .post("/api/v1/courier")
-                .then()
-                .statusCode(409)
-                .body("message", equalTo("Этот логин уже используется. Попробуйте другой."));
-    }
 
-    @Step("Попытка создать курьера с невалидными данными")
-    private void attemptToCreateCourierWithInvalidData(Courier courier) {
-        given()
-                .header("Content-Type", "application/json")
-                .body(courier)
-                .when()
-                .post("/api/v1/courier")
-                .then()
-                .statusCode(400)
-                .body("message", equalTo("Недостаточно данных для создания учетной записи"));
-    }
+
+
+
 
 
 }

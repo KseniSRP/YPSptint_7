@@ -16,8 +16,8 @@ public class CourierLoginAPITest extends BaseTest {
         String uniqueLogin = "testLogin" + System.currentTimeMillis();
         String password = "password123";
         Courier courier = new Courier(uniqueLogin, password, "John");
-        createCourier(courier);
-        courierLogin(uniqueLogin, password);
+        CourierClient.createCourier(courier);
+        CourierClient.courierLogin(uniqueLogin, password);
     }
 
     @Test
@@ -29,9 +29,9 @@ public class CourierLoginAPITest extends BaseTest {
         String password = "password123";
         Courier courier = new Courier(uniqueLogin, password, "John");
 
-        createCourier(courier);
+        CourierClient.createCourier(courier);
 
-        loginWithInvalidCredentials(invalidLogin, password);
+        CourierClient.loginWithInvalidCredentials(invalidLogin, password);
     }
 
     @Test
@@ -43,65 +43,18 @@ public class CourierLoginAPITest extends BaseTest {
         String invalidPassword = "password1234";
         Courier courier = new Courier(uniqueLogin, password, "John");
 
-        createCourier(courier);
+        CourierClient.createCourier(courier);
 
-        loginWithInvalidCredentials(uniqueLogin, invalidPassword);
+        CourierClient.loginWithInvalidCredentials(uniqueLogin, invalidPassword);
     }
 
     @Test
     @DisplayName("Тест логина курьера без учетных данных")
     @Description("Тест проверяет, что логин курьера без указания учетных данных не проходит.")
     public void testLoginWithoutCredentialsFails() {
-        loginWithoutCredentials();
+        CourierClient.loginWithoutCredentials();
     }
 
-    @Step("Создание курьера")
-    private void createCourier(Courier courier) {
-        given()
-                .header("Content-Type", "application/json")
-                .body(courier)
-                .when()
-                .post("/api/v1/courier")
-                .then()
-                .statusCode(201)
-                .body("ok", equalTo(true));
-    }
-
-    @Step("Логин курьера с логином {login} и паролем {password}")
-    private void courierLogin(String login, String password) {
-        given()
-                .header("Content-Type", "application/json")
-                .body("{\"login\":\"" + login + "\", \"password\":\"" + password + "\"}")
-                .when()
-                .post("/api/v1/courier/login")
-                .then()
-                .statusCode(200)
-                .body("id", notNullValue());
-    }
-
-    @Step("Попытка входа в систему с невалидными учетными данными {login}/{password}")
-    private void loginWithInvalidCredentials(String login, String password) {
-        given()
-                .header("Content-Type", "application/json")
-                .body("{\"login\":\"" + login + "\", \"password\":\"" + password + "\"}")
-                .when()
-                .post("/api/v1/courier/login")
-                .then()
-                .statusCode(404)
-                .body("message", equalTo("Учетная запись не найдена"));
-    }
-
-    @Step("Попытка логина без учетных данных")
-    private void loginWithoutCredentials() {
-        given()
-                .header("Content-Type", "application/json")
-                .body("{\"login\":\"\", \"password\":\"\"}")
-                .when()
-                .post("/api/v1/courier/login")
-                .then()
-                .statusCode(400)
-                .body("message", equalTo("Недостаточно данных для входа"));
-    }
 
 
 }

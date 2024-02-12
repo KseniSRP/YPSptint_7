@@ -35,20 +35,9 @@ public class OrderCreationAPITest extends BaseTest {
     @DisplayName("Проверка создания заказа с разными цветами")
     @Description("Тест создает заказ с указанными цветами")
     public void testCreateOrderWithColors () {
-        createOrder(order);
+        OrdersClient.createOrder(order);
     }
 
-    @Step("Создание заказа с цветом: {0}")
-    public void createOrder (Order order){
-        given()
-                .header("Content-Type", "application/json")
-                .body(order)
-                .when()
-                .post("/api/v1/orders")
-                .then()
-                .statusCode(201)
-                .body("track", notNullValue());
-    }
+
 
 }
-

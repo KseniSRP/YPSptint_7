@@ -12,20 +12,9 @@ public class OrderListAPITest extends BaseTest {
     @DisplayName("Получение списка всех заказов")
     @Description("Тест проверяет получение списка всех активных и завершенных заказов")
     public void ordersListGetWithoutCourierId() {
-        ordersListGet();
+        OrdersClient.ordersListGet();
     }
 
-    @Step("Получение списка всех заказов без указания courierId")
-    public void ordersListGet() {
-        given()
-                .header("Content-Type", "application/json")
-                .when()
-                .get("/api/v1/orders")
-                .then()
-                .statusCode(200) // Проверка статуса кода 200
-                .body("orders", notNullValue()) // Проверка на наличие массива заказов
-                .body("orders.size()", greaterThan(0)); // Проверка, что в списке есть заказы
 
-    }
 
 }

@@ -14,25 +14,15 @@ public class BaseTest {
         RestAssured.baseURI = "http://qa-scooter.praktikum-services.ru";
     }
 
+
     @After
     public void tearDown() {
         // Удаление курьера после каждого теста, если он был создан
         if (courierId != null) {
-            deleteCourier(courierId);
+            CourierClient.deleteCourier(courierId);
         }
 
     }
 
-
-    public void deleteCourier(int courierId) {
-        given()
-                .header("Content-Type", "application/json")
-                .pathParam("id", courierId)
-                .when()
-                .delete("/api/v1/courier/{id}")
-                .then()
-                .statusCode(200)
-                .body("ok", equalTo(true));
-    }
 
 }
